@@ -11,6 +11,7 @@ const movieRoutes = require('./routes/movies');
 const { login, createUser } = require('./controllers/users');
 const errorsHandler = require('./middlewares/errorsHandler');
 const NotFoundError = require('./errors/not-found-err');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cors());
+app.use(requestLogger);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -56,6 +58,7 @@ app.use('/movies', auth, movieRoutes);
 app.use('*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден');
 });
+app.use(errorLogger);
 app.use(errors());
 app.use(errorsHandler);
 
