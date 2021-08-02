@@ -19,6 +19,5 @@ module.exports = (req, res, next) => {
     next(new AutorizationError('Необходима авторизация'));
   }
   req.user = payload;
-
   next();
 };

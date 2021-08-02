@@ -1,7 +1,9 @@
+const { notFoundError } = require('../utils/db');
+
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = 404;
+    this.statusCode = notFoundError;
   }
 }
 

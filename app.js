@@ -13,7 +13,7 @@ const errorsHandler = require('./middlewares/errorsHandler');
 const NotFoundError = require('./errors/not-found-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { server } = require('./utils/config');
-const { limiter } = require('./middlewares/limiter');
+const limiter = require('./middlewares/limiter');
 
 const { PORT = 3000 } = process.env;
 const app = express();
