@@ -12,11 +12,13 @@ const { login, createUser } = require('./controllers/users');
 const errorsHandler = require('./middlewares/errorsHandler');
 const NotFoundError = require('./errors/not-found-err');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { server } = require('./utils/config');
+const { limiter } = require('./middlewares/limiter');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/movies-explorer', {
+mongoose.connect(server, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
@@ -28,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cors());
 app.use(requestLogger);
+app.use(limiter);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -39,11 +42,6 @@ login);
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(40),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string()
-      .pattern(/^(http:|https:)\/\/(w{3}\.)?[^а-яё\s]*$/)
-      .min(2)
-      .max(80),
     email: Joi.string().required().email(),
     password: Joi.string().required().min(6),
   }),
