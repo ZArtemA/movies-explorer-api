@@ -10,7 +10,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { server } = require('./utils/config');
 const limiter = require('./middlewares/limiter');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3005 } = process.env;
 const app = express();
 
 mongoose.connect(server, {

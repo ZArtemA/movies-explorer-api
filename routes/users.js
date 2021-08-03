@@ -5,11 +5,13 @@ const {
 } = require('../controllers/users');
 
 router.get('/me', getLoggedUser);
+
 router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(40),
-    email: Joi.string().required().min(2).max(30),
-  }),
+    email: Joi.string().required(),
+  })
+    .unknown(true),
 }),
 patchUser);
 
