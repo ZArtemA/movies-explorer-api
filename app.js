@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { errors } = require('celebrate');
 const routes = require('./routes/index');
@@ -26,6 +27,7 @@ app.use(helmet());
 app.use(cors());
 app.use(requestLogger);
 app.use(limiter);
+app.use(cookieParser());
 
 app.use('/', routes);
 

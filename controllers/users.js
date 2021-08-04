@@ -35,9 +35,9 @@ module.exports.createUser = (req, res, next) => {
     }))
     .then((user) => {
       res.send({
-        data: {
-          name: user.name, email: user.email,
-        },
+        name: user.name,
+        email: user.email,
+        id: user._id,
       });
     })
     .catch((error) => {
@@ -82,9 +82,13 @@ module.exports.login = (req, res, next) => {
         { expiresIn: '7d' },
 
       );
-      res.send({ token });
+      return res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: true }).send({ token });
     })
     .catch(() => {
       next(new AutorizationError('Ошибка авторизации'));
     });
+};
+
+module.exports.signOut = (req, res) => {
+  res.clearCookie('jwt').send({ message: 'Пользователь вышел' });
 };
