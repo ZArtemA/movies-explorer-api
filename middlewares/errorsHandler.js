@@ -1,10 +1,12 @@
+const { serverError, serverErrorText } = require('../utils/db');
+
 module.exports = (error, req, res, next) => {
-  const { statusCode = 500, message } = error;
+  const { statusCode = serverError, message } = error;
   res
     .status(statusCode)
     .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
+      message: statusCode === serverError
+        ? serverErrorText
         : message,
     });
   next();

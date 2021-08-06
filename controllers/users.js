@@ -5,6 +5,16 @@ const NotFoundError = require('../errors/not-found-err');
 const RequestError = require('../errors/request-err');
 const AutorizationError = require('../errors/authorization-err');
 const MongoError = require('../errors/mongo-err');
+const {
+  userIdNotFound,
+  IdNotValid,
+  userIncorrect,
+  userAlreadyExist,
+  userCreateIncorrect,
+  userDublicateEmail,
+  errorUserorPassword,
+  userExit,
+} = require('../utils/db');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -15,10 +25,10 @@ module.exports.getLoggedUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((error) => {
       if (error.message === 'NotValidId') {
-        throw new NotFoundError('Пользователь по указанному _id не найден.');
+        throw new NotFoundError(userIdNotFound);
       }
       if (error.name === 'CastError') {
-        throw new RequestError('Невалидный id.');
+        throw new RequestError(IdNotValid);
       }
       next(error);
     })
@@ -42,10 +52,10 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError' || error.name === 'CastError') {
-        throw new RequestError('Переданы некорректные данные при создании пользователя.');
+        throw new RequestError(userIncorrect);
       }
       if (error.name === 'MongoError' && error.code === 11000) {
-        throw new MongoError('Пользователь с таким email уже зарегистрирован.');
+        throw new MongoError(userAlreadyExist);
       }
       next(error);
     })
@@ -59,13 +69,16 @@ module.exports.patchUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((error) => {
       if (error.message === 'NotValidId') {
-        throw new NotFoundError('Пользователь с указанным _id не найден.');
+        throw new NotFoundError(userIdNotFound);
       }
       if (error.name === 'CastError') {
-        throw new RequestError('Невалидный id.');
+        throw new RequestError(IdNotValid);
       }
       if (error.name === 'ValidationError') {
-        throw new RequestError('Переданы некорректные данные при обновлении профиля.');
+        throw new RequestError(userCreateIncorrect);
+      }
+      if (error.codeName === 'DuplicateKey') {
+        throw new MongoError(userDublicateEmail);
       }
       next(error);
     })
@@ -85,10 +98,10 @@ module.exports.login = (req, res, next) => {
       return res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: true }).send({ token });
     })
     .catch(() => {
-      next(new AutorizationError('Ошибка авторизации'));
+      next(new AutorizationError(errorUserorPassword));
     });
 };
 
 module.exports.signOut = (req, res) => {
-  res.clearCookie('jwt').send({ message: 'Пользователь вышел' });
+  res.clearCookie('jwt').send({ message: userExit });
 };

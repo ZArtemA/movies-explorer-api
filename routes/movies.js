@@ -1,8 +1,10 @@
 const router = require('express').Router();
+const validator = require('validator');
 const { celebrate, Joi } = require('celebrate');
 const {
   getMovies, postMovie, deleteMovie,
 } = require('../controllers/movies');
+const { unvalidImage, unvalidTrailer, unvalidThumbnail } = require('../utils/db');
 
 router.get('/', getMovies);
 
@@ -10,31 +12,37 @@ router.post('/', celebrate({
   body: Joi.object().keys({
     country: Joi.string().required(),
     director: Joi.string().required(),
-    duration: Joi.string().required(),
+    duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    movieId: Joi.string().required(),
+    movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
-    image: Joi.string()
-      .pattern(/^(http:|https:)\/\/(w{3}\.)?[^а-яё\s]*$/)
-      .required().min(2)
-      .max(80),
-    trailer: Joi.string()
-      .pattern(/^(http:|https:)\/\/(w{3}\.)?[^а-яё\s]*$/)
-      .required().min(2)
-      .max(80),
-    thumbnail: Joi.string()
-      .pattern(/^(http:|https:)\/\/(w{3}\.)?[^а-яё\s]*$/)
-      .required().min(2)
-      .max(80),
+    image: Joi.string().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message(unvalidImage);
+    }),
+    trailer: Joi.string().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message(unvalidTrailer);
+    }),
+    thumbnail: Joi.string().custom((value, helpers) => {
+      if (validator.isURL(value)) {
+        return value;
+      }
+      return helpers.message(unvalidThumbnail);
+    }),
   }),
 }),
 postMovie);
 
-router.delete('/:movieId ', celebrate({
+router.delete('/:_id', celebrate({
   params: Joi.object().keys({
-    movieId: Joi.string().length(24).hex(),
+    movieId: Joi.number(),
   }).unknown(true),
 }),
 deleteMovie);
