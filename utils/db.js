@@ -27,3 +27,29 @@ module.exports.movieCreateIncorrect = 'Переданы некорректные
 module.exports.deleteMovieForbid = 'Нельзя удалить чужой фильм.';
 module.exports.movieDeleted = 'Фильм удален';
 module.exports.movieIdNotFound = 'Фильм с указанным _id не найден.';
+
+const whitelist = [
+  'https://artem-diplomaproject.nomoredomains.club/',
+  'http://artem-diplomaproject.nomoredomains.club/',
+  '5.166.68.59',
+  'http://localhost:3000',
+  'https://localhost:3000',
+  'http://localhost:3001',
+  'https://localhost:3001',
+  'http://localhost:3005',
+  'https://localhost:3005',
+  'http://localhost:5000',
+  'https://localhost:5000',
+];
+
+module.exports.corsOptions = {
+  origin(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
